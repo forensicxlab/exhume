@@ -22,3 +22,18 @@
 [submodule "members/members/exhume_filesystem"]
 	path = members/members/exhume_filesystem
 	url = git@github.com:forensicxlab/exhume_filesystem.git
+[submodule "members/exhume_filesystem"]
+	path = members/exhume_filesystem
+	url = git@github.com:forensicxlab/exhume_filesystem.git
+[submodule "members/exhume_lvm"]
+	path = members/exhume_lvm
+	url = git@github.com:forensicxlab/exhume_lvm.git
+[submodule "members/exhume_extfs"]
+	path = members/exhume_extfs
+	url = git@github.com:forensicxlab/exhume_extfs.git
+[submodule "members/exhume_exfat"]
+	path = members/exhume_exfat
+	url = git@github.com:forensicxlab/exhume_exfat.git
+[submodule "members/exhume_partitions"]
+	path = members/exhume_partitions
+	url = git@github.com:forensicxlab/exhume_partitions.git
