@@ -1,0 +1,11 @@
+[workspace]
+members = [
+  "members/exhume_body",
+  "members/exhume_extfs",
+  "members/exhume_exfat",
+  "members/exhume_filesystem",
+  "members/exhume_lvm",
+  "members/exhume_ntfs",
+  "members/exhume_partitions",
+]
+resolver = "2"
