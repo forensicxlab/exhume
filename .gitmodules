@@ -16,9 +16,7 @@
 [submodule "members/exhume_body"]
 	path = members/exhume_body
 	url = git@github.com:forensicxlab/exhume_body.git
-[submodule "members/members/exhume_ntfs"]
-	path = members/members/exhume_ntfs
-	url = git@github.com:forensicxlab/exhume_ntfs.git
 [submodule "members/exhume_ntfs"]
 	path = members/exhume_ntfs
 	url = git@github.com:forensicxlab/exhume_ntfs.git
+	branch = main
