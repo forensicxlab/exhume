@@ -1,0 +1,70 @@
+# ===================================
+# Rust & Cargo
+# ===================================
+# Build and target artifacts
+target/
+**/target/
+
+# Debugging / profiling data
+*.profraw
+*.profdata
+*.gcda
+*.gcno
+*.gcov
+*.dSYM/
+*.pdb
+*.exe.stackdump
+
+# Cargo package backups
+**/*.rs.bk
+Cargo.lock         # keep this ignored in a workspace (see note below)
+
+# Generated docs
+**/doc/
+
+# Rust analyzer / IDE caches
+**/.idea/
+**/.vscode/
+**/.vs/
+**/.DS_Store
+**/Thumbs.db
+
+# ===================================
+# Git submodules / umbrella repo
+# ===================================
+# Prevent nested .git directories inside submodules from being committed accidentally
+**/.git
+**/.gitignore~
+**/.gitmodules~
+
+# You *do* commit .gitmodules and submodule pointers, but not submodule internals.
+# If you ever vendor (subtree) a repo instead of submodule, adjust accordingly.
+
+# ===================================
+# Logs / temporary files
+# ===================================
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak
+
+# ===================================
+# Tooling / environments
+# ===================================
+# Rust toolchain override
+# (Keep rust-toolchain.toml itself committed, but ignore transient backups)
+rust-toolchain.toml.bak
+rust-toolchain.bak
+
+# Mac / Windows OS noise
+.DS_Store
+Thumbs.db
+
+# Python virtualenvs (if you use any scripts)
+venv/
+.env/
+
+# Cargo audit / outdated caches
+.cargo-cache/
+.cargo-audit.toml
