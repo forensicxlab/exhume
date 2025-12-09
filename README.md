@@ -7,5 +7,5 @@ The Exhume ToolKit umbrella repository containing all of the exhume toolkit fram
 git clone --recurse-submodules git@github.com:forensicxlab/exhume.git
 cargo build
 # Example run of the exhume_body module
-cargo run -b exhume_body -- --help
+cargo run --bin exhume_body -- --help
 ```

@@ -215,12 +215,11 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "4.5.51"
+version = "4.5.53"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4c26d721170e0295f191a69bd9a1f93efcdb0aff38684b61ab5750468972e5f5"
+checksum = "c9e340e012a1bf4935f5282ed1436d1489548e8f72308207ea5df0e23d2d03f8"
 dependencies = [
  "clap_builder",
- "clap_derive",
 ]
 
 [[package]]
@@ -234,26 +233,14 @@ dependencies = [
 
 [[package]]
 name = "clap_builder"
-version = "4.5.51"
+version = "4.5.53"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "75835f0c7bf681bfd05abe44e965760fea999a5286c6eb2d59883634fd02011a"
+checksum = "d76b5d13eaa18c901fd2f7fca939fefe3a0727a953561fefdf3b2922b8569d00"
 dependencies = [
  "anstream",
  "anstyle",
  "clap_lex",
  "strsim",
-]
-
-[[package]]
-name = "clap_derive"
-version = "4.5.49"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a0b5487afeab2deb2ff4e03a807ad1a03ac532ff5a2cee5d86884440c7f7671"
-dependencies = [
- "heck 0.5.0",
- "proc-macro2",
- "quote",
- "syn 2.0.108",
 ]
 
 [[package]]
@@ -575,6 +562,8 @@ dependencies = [
 [[package]]
 name = "exhume_body"
 version = "0.3.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c3c0d061ec67b7a06d7e424aa55a57fc5c76d4d9042c4ebd523a2a8fda92631b"
 dependencies = [
  "clap",
  "clap-num",
@@ -589,9 +578,7 @@ dependencies = [
 
 [[package]]
 name = "exhume_body"
-version = "0.3.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c3c0d061ec67b7a06d7e424aa55a57fc5c76d4d9042c4ebd523a2a8fda92631b"
+version = "0.3.5"
 dependencies = [
  "clap",
  "clap-num",
@@ -613,7 +600,7 @@ dependencies = [
  "clap",
  "clap-num",
  "env_logger",
- "exhume_body 0.3.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "exhume_body 0.3.4",
  "log",
  "prettytable",
  "serde",
@@ -630,7 +617,7 @@ dependencies = [
  "clap",
  "clap-num",
  "env_logger",
- "exhume_body 0.3.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "exhume_body 0.3.4",
  "log",
  "prettytable-rs",
  "serde",
@@ -648,7 +635,7 @@ dependencies = [
  "clap",
  "clap-num",
  "env_logger",
- "exhume_body 0.3.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "exhume_body 0.3.4",
  "log",
  "prettytable-rs",
  "serde",
@@ -662,10 +649,10 @@ dependencies = [
  "clap",
  "clap-num",
  "env_logger",
- "exhume_body 0.3.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "exhume_body 0.3.4",
  "exhume_exfat",
  "exhume_extfs 0.1.9 (registry+https://github.com/rust-lang/crates.io-index)",
- "exhume_ntfs 0.1.6",
+ "exhume_ntfs 0.1.9",
  "log",
  "serde",
  "serde_json",
@@ -674,14 +661,14 @@ dependencies = [
 
 [[package]]
 name = "exhume_lvm"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "acid_io",
  "byteorder",
  "clap",
  "clap-num",
  "env_logger",
- "exhume_body 0.3.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "exhume_body 0.3.4",
  "log",
  "nom",
  "prettytable-rs",
@@ -692,9 +679,9 @@ dependencies = [
 
 [[package]]
 name = "exhume_ntfs"
-version = "0.1.6"
+version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "29f7c9797fa676eeae3d365ea5279c73ccb3cc7c95033f2a75aafac138618496"
+checksum = "e707ef4a0c274dc3a19fa002affbc50137c2d32d1b21c87eb17b599b8bd47f37"
 dependencies = [
  "byteorder",
  "capstone",
@@ -702,7 +689,7 @@ dependencies = [
  "clap",
  "clap-num",
  "env_logger",
- "exhume_body 0.3.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "exhume_body 0.3.4",
  "log",
  "prettytable-rs",
  "serde",
@@ -711,7 +698,7 @@ dependencies = [
 
 [[package]]
 name = "exhume_ntfs"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "byteorder",
  "capstone",
@@ -719,7 +706,7 @@ dependencies = [
  "clap",
  "clap-num",
  "env_logger",
- "exhume_body 0.3.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "exhume_body 0.3.4",
  "log",
  "prettytable-rs",
  "serde",
@@ -728,13 +715,13 @@ dependencies = [
 
 [[package]]
 name = "exhume_partitions"
-version = "0.3.3"
+version = "0.3.4"
 dependencies = [
  "byteorder",
  "capstone",
  "clap",
  "env_logger",
- "exhume_body 0.3.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "exhume_body 0.3.4",
  "glob",
  "log",
  "prettytable-rs",
@@ -1284,9 +1271,9 @@ dependencies = [
 
 [[package]]
 name = "log"
-version = "0.4.28"
+version = "0.4.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "34080505efa8e45a4b816c349525ebe327ceaa8559756f0356cba97ef3bf7432"
+checksum = "5e5032e24019045c762d3c0f28f5b6b8bbf38563a65908389bf7978758920897"
 
 [[package]]
 name = "md-5"
@@ -1903,9 +1890,9 @@ dependencies = [
 
 [[package]]
 name = "serde_with"
-version = "3.15.1"
+version = "3.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aa66c845eee442168b2c8134fec70ac50dc20e760769c8ba0ad1319ca1959b04"
+checksum = "4fa237f2807440d238e0364a218270b98f767a00d3dada77b1c53ae88940e2e7"
 dependencies = [
  "base64",
  "chrono",
@@ -1922,9 +1909,9 @@ dependencies = [
 
 [[package]]
 name = "serde_with_macros"
-version = "3.15.1"
+version = "3.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b91a903660542fced4e99881aa481bdbaec1634568ee02e0b8bd57c64cb38955"
+checksum = "52a8e3ca0ca629121f70ab50f95249e5a6f925cc0f6ffe8256c45b728875706c"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -2440,9 +2427,9 @@ dependencies = [
 
 [[package]]
 name = "tracing"
-version = "0.1.41"
+version = "0.1.43"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "784e0ac535deb450455cbfa28a6f0df145ea1bb7ae51b821cf5e7927fdcfbdd0"
+checksum = "2d15d90a0b5c19378952d479dc858407149d7bb45a14de0142f6c534b16fc647"
 dependencies = [
  "log",
  "pin-project-lite",
@@ -2452,9 +2439,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-attributes"
-version = "0.1.30"
+version = "0.1.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "81383ab64e72a7a8b8e13130c49e3dab29def6d0c7d76a03087b3cf71c5c6903"
+checksum = "7490cfa5ec963746568740651ac6781f701c9c5ea257c58e057f3ba8cf69e8da"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2463,9 +2450,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-core"
-version = "0.1.34"
+version = "0.1.35"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b9d12581f227e93f094d3af2ae690a574abb8a2b9b7a96e7cfe9647b2b617678"
+checksum = "7a04e24fab5c89c6a36eb8558c9656f30d81de51dfa4d3b45f26b21d61fa0a6c"
 dependencies = [
  "once_cell",
 ]
