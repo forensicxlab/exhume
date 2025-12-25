@@ -7,5 +7,16 @@ members = [
   "members/exhume_lvm",
   "members/exhume_ntfs",
   "members/exhume_partitions",
+  "members/exhume_artefacts",
 ]
 resolver = "2"
+
+[patch.crates-io]
+exhume_artefacts  = { path = "members/exhume_artefacts" }
+exhume_body       = { path = "members/exhume_body" }
+exhume_filesystem = { path = "members/exhume_filesystem" }
+exhume_partitions = { path = "members/exhume_partitions" }
+exhume_extfs      = { path = "members/exhume_extfs" }
+exhume_exfat      = { path = "members/exhume_exfat" }
+exhume_lvm        = { path = "members/exhume_lvm" }
+exhume_ntfs       = { path = "members/exhume_ntfs" }

@@ -26,3 +26,6 @@
 	path = members/exhume_ntfs
 	url = git@github.com:forensicxlab/exhume_ntfs.git
 	branch = main
+[submodule "members/exhume_artefacts"]
+	path = members/exhume_artefacts
+	url = git@github.com:forensicxlab/exhume_artefacts.git
