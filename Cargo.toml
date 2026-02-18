@@ -8,6 +8,7 @@ members = [
   "members/exhume_ntfs",
   "members/exhume_partitions",
   "members/exhume_artefacts",
+  "members/exhume_apfs",
 ]
 resolver = "2"
 
@@ -20,3 +21,4 @@ exhume_extfs      = { path = "members/exhume_extfs" }
 exhume_exfat      = { path = "members/exhume_exfat" }
 exhume_lvm        = { path = "members/exhume_lvm" }
 exhume_ntfs       = { path = "members/exhume_ntfs" }
+exhume_apfs       = { path = "members/exhume_apfs" }

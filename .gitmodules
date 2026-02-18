@@ -29,3 +29,7 @@
 [submodule "members/exhume_artefacts"]
 	path = members/exhume_artefacts
 	url = git@github.com:forensicxlab/exhume_artefacts.git
+	branch = main
+[submodule "members/exhume_apfs"]
+	path = members/exhume_apfs
+	url = git@github.com:forensicxlab/exhume_apfs.git
