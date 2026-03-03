@@ -21,6 +21,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "320119579fcad9c21884f5c4861d16174d0e06250625266f50fe6898340abefa"
 
 [[package]]
+name = "aes"
+version = "0.8.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b169f7a6d4742236a0a00c541b845991d0ac43e546831af1249753ab4c3aa3a0"
+dependencies = [
+ "cfg-if",
+ "cipher",
+ "cpufeatures",
+]
+
+[[package]]
 name = "ahash"
 version = "0.8.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -266,6 +277,16 @@ dependencies = [
  "serde",
  "wasm-bindgen",
  "windows-link",
+]
+
+[[package]]
+name = "cipher"
+version = "0.4.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "773f3b9af64447d2ce9850330c473515014aa235e6a783b02db81ff39e4a3dad"
+dependencies = [
+ "crypto-common",
+ "inout",
 ]
 
 [[package]]
@@ -761,24 +782,6 @@ dependencies = [
 
 [[package]]
 name = "exhume_apfs"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "90d057d6bea25b9572bcd8dd2953a9e488cb2256e2f691fab58c54cd70ac4027"
-dependencies = [
- "byteorder",
- "chrono",
- "clap",
- "clap-num",
- "env_logger",
- "exhume_body",
- "log",
- "prettytable-rs",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "exhume_apfs"
 version = "0.1.3"
 dependencies = [
  "byteorder",
@@ -795,7 +798,7 @@ dependencies = [
 
 [[package]]
 name = "exhume_artefacts"
-version = "0.2.3"
+version = "0.2.4"
 dependencies = [
  "anyhow",
  "clap",
@@ -816,7 +819,7 @@ dependencies = [
 
 [[package]]
 name = "exhume_body"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "clap",
  "clap-num",
@@ -836,7 +839,7 @@ dependencies = [
 
 [[package]]
 name = "exhume_exfat"
-version = "0.1.7"
+version = "0.1.8"
 dependencies = [
  "anyhow",
  "chrono",
@@ -853,7 +856,7 @@ dependencies = [
 
 [[package]]
 name = "exhume_extfs"
-version = "0.1.13"
+version = "0.1.14"
 dependencies = [
  "byteorder",
  "chrono",
@@ -869,12 +872,12 @@ dependencies = [
 
 [[package]]
 name = "exhume_filesystem"
-version = "0.4.2"
+version = "0.4.3"
 dependencies = [
  "clap",
  "clap-num",
  "env_logger",
- "exhume_apfs 0.1.2",
+ "exhume_apfs",
  "exhume_body",
  "exhume_exfat",
  "exhume_extfs",
@@ -887,7 +890,7 @@ dependencies = [
 
 [[package]]
 name = "exhume_lvm"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "acid_io",
  "byteorder",
@@ -905,24 +908,28 @@ dependencies = [
 
 [[package]]
 name = "exhume_ntfs"
-version = "0.1.13"
+version = "0.1.14"
 dependencies = [
+ "aes",
  "byteorder",
  "capstone",
  "chrono",
+ "cipher",
  "clap",
  "clap-num",
  "env_logger",
  "exhume_body",
+ "hex",
  "log",
  "prettytable-rs",
  "serde",
  "serde_json",
+ "xts-mode",
 ]
 
 [[package]]
 name = "exhume_partitions"
-version = "0.3.7"
+version = "0.3.8"
 dependencies = [
  "byteorder",
  "capstone",
@@ -1390,6 +1397,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "79cf5c93f93228cf8efb3ba362535fb11199ac548a09ce117c9b1adc3030d706"
 dependencies = [
  "rustversion",
+]
+
+[[package]]
+name = "inout"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "879f10e63c20629ecabbb64a8010319738c66a5cd0c29b02d63d272b03751d01"
+dependencies = [
+ "generic-array",
 ]
 
 [[package]]
@@ -2785,6 +2801,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "tester"
+version = "0.1.0"
+dependencies = [
+ "aes",
+ "byteorder",
+ "cipher",
+ "exhume_body",
+ "exhume_ntfs",
+ "hex",
+ "xts-mode",
+]
+
+[[package]]
 name = "thiserror"
 version = "1.0.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3638,6 +3667,16 @@ name = "writeable"
 version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9edde0db4769d2dc68579893f2306b26c6ecfbe0ef499b013d731b7b9247e0b9"
+
+[[package]]
+name = "xts-mode"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "09cbddb7545ca0b9ffa7bdc653e8743303e1712687a6918ced25f2cdbed42520"
+dependencies = [
+ "byteorder",
+ "cipher",
+]
 
 [[package]]
 name = "yoke"

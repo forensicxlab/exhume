@@ -8,7 +8,7 @@ members = [
   "members/exhume_ntfs",
   "members/exhume_partitions",
   "members/exhume_artefacts",
-  "members/exhume_apfs",
+  "members/exhume_apfs", "tester",
 ]
 resolver = "2"
 
