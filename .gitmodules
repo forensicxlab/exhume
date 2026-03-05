@@ -33,3 +33,9 @@
 [submodule "members/exhume_apfs"]
 	path = members/exhume_apfs
 	url = git@github.com:forensicxlab/exhume_apfs.git
+[submodule "members/exhume_agent"]
+	path = members/exhume_agent
+	url = https://github.com/forensicxlab/exhume_agent.git
+[submodule "members/exhume_indexer"]
+	path = members/exhume_indexer
+	url = https://github.com/forensicxlab/exhume_indexer.git
