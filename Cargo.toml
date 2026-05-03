@@ -8,11 +8,15 @@ members = [
   "members/exhume_ntfs",
   "members/exhume_partitions",
   "members/exhume_artefacts",
-  "members/exhume_apfs", "members/exhume_agent", "members/exhume_indexer",
+  "members/exhume_apfs",
+  #"members/exhume_agent",
+  "members/exhume_indexer",
+  "members/exhume_memory",
 ]
 resolver = "2"
 
 [patch.crates-io]
+memflow = { git = "https://github.com/forensicxlab/memflow", branch = "main" }
 exhume_artefacts  = { path = "members/exhume_artefacts" }
 exhume_body       = { path = "members/exhume_body" }
 exhume_filesystem = { path = "members/exhume_filesystem" }
@@ -22,3 +26,6 @@ exhume_exfat      = { path = "members/exhume_exfat" }
 exhume_lvm        = { path = "members/exhume_lvm" }
 exhume_ntfs       = { path = "members/exhume_ntfs" }
 exhume_apfs       = { path = "members/exhume_apfs" }
+exhume_indexer    = { path = "members/exhume_indexer" }
+exhume_memory    = { path = "members/exhume_memory" }
+#exhume_agent      = { path = "members/exhume_agent" }
