@@ -9,7 +9,7 @@ members = [
   "members/exhume_partitions",
   "members/exhume_artefacts",
   "members/exhume_apfs",
-  #"members/exhume_agent",
+  "members/exhume_agent",
   "members/exhume_indexer",
   "members/exhume_memory",
 ]
@@ -28,4 +28,4 @@ exhume_ntfs       = { path = "members/exhume_ntfs" }
 exhume_apfs       = { path = "members/exhume_apfs" }
 exhume_indexer    = { path = "members/exhume_indexer" }
 exhume_memory    = { path = "members/exhume_memory" }
-#exhume_agent      = { path = "members/exhume_agent" }
+exhume_agent      = { path = "members/exhume_agent" }
