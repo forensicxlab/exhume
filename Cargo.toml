@@ -16,7 +16,6 @@ members = [
 resolver = "2"
 
 [patch.crates-io]
-memflow = { git = "https://github.com/forensicxlab/memflow", branch = "main" }
 exhume_artefacts  = { path = "members/exhume_artefacts" }
 exhume_body       = { path = "members/exhume_body" }
 exhume_filesystem = { path = "members/exhume_filesystem" }

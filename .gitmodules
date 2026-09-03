@@ -1,41 +1,45 @@
 [submodule "members/exhume_filesystem"]
 	path = members/exhume_filesystem
-	url = git@github.com:forensicxlab/exhume_filesystem.git
+	url = https://github.com/forensicxlab/exhume_filesystem.git
 	branch = main
 [submodule "members/exhume_lvm"]
 	path = members/exhume_lvm
-	url = git@github.com:forensicxlab/exhume_lvm.git
+	url = https://github.com/forensicxlab/exhume_lvm.git
 	branch = main
 [submodule "members/exhume_extfs"]
 	path = members/exhume_extfs
-	url = git@github.com:forensicxlab/exhume_extfs.git
+	url = https://github.com/forensicxlab/exhume_extfs.git
 	branch = main
 [submodule "members/exhume_exfat"]
 	path = members/exhume_exfat
-	url = git@github.com:forensicxlab/exhume_exfat.git
+	url = https://github.com/forensicxlab/exhume_exfat.git
 	branch = main
 [submodule "members/exhume_partitions"]
 	path = members/exhume_partitions
-	url = git@github.com:forensicxlab/exhume_partitions.git
+	url = https://github.com/forensicxlab/exhume_partitions.git
 	branch = main
 [submodule "members/exhume_body"]
 	path = members/exhume_body
-	url = git@github.com:forensicxlab/exhume_body.git
+	url = https://github.com/forensicxlab/exhume_body.git
 	branch = main
 [submodule "members/exhume_ntfs"]
 	path = members/exhume_ntfs
-	url = git@github.com:forensicxlab/exhume_ntfs.git
+	url = https://github.com/forensicxlab/exhume_ntfs.git
 	branch = main
 [submodule "members/exhume_artefacts"]
 	path = members/exhume_artefacts
-	url = git@github.com:forensicxlab/exhume_artefacts.git
+	url = https://github.com/forensicxlab/exhume_artefacts.git
 	branch = main
 [submodule "members/exhume_apfs"]
 	path = members/exhume_apfs
-	url = git@github.com:forensicxlab/exhume_apfs.git
+	url = https://github.com/forensicxlab/exhume_apfs.git
 [submodule "members/exhume_agent"]
 	path = members/exhume_agent
 	url = https://github.com/forensicxlab/exhume_agent.git
 [submodule "members/exhume_indexer"]
 	path = members/exhume_indexer
 	url = https://github.com/forensicxlab/exhume_indexer.git
+[submodule "members/exhume_memory"]
+	path = members/exhume_memory
+	url = https://github.com/forensicxlab/exhume_memory.git
+	branch = main
