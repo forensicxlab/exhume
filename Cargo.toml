@@ -11,6 +11,7 @@ members = [
   "members/exhume_apfs",
   "members/exhume_agent",
   "members/exhume_indexer",
+  "members/exhume_grep",
   "members/exhume_memory",
 ]
 resolver = "2"
@@ -28,3 +29,4 @@ exhume_apfs       = { path = "members/exhume_apfs" }
 exhume_indexer    = { path = "members/exhume_indexer" }
 exhume_memory    = { path = "members/exhume_memory" }
 exhume_agent      = { path = "members/exhume_agent" }
+exhume_grep       = { path = "members/exhume_grep" }
