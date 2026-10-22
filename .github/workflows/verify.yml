@@ -145,15 +145,31 @@ jobs:
             ~/.cargo/git/db
           key: cargo-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('Cargo.lock') }}
       - name: Compile release executables
+        if: runner.os != 'Windows'
         env:
           RELEASE_TARGET: ${{ matrix.config.target }}
           RELEASE_GROUP: ${{ matrix.group }}
         run: python scripts/release.py build --target "$RELEASE_TARGET" --group "$RELEASE_GROUP"
       - name: Package, audit dependencies, and smoke-test extracted executables
+        if: runner.os != 'Windows'
         env:
           RELEASE_TARGET: ${{ matrix.config.target }}
           RELEASE_GROUP: ${{ matrix.group }}
         run: python scripts/release.py package --target "$RELEASE_TARGET" --group "$RELEASE_GROUP"
+      - name: Compile Windows release executables
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          RELEASE_TARGET: ${{ matrix.config.target }}
+          RELEASE_GROUP: ${{ matrix.group }}
+        run: python scripts/release.py build --target "$env:RELEASE_TARGET" --group "$env:RELEASE_GROUP"
+      - name: Package and smoke-test Windows executables
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          RELEASE_TARGET: ${{ matrix.config.target }}
+          RELEASE_GROUP: ${{ matrix.group }}
+        run: python scripts/release.py package --target "$env:RELEASE_TARGET" --group "$env:RELEASE_GROUP"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: packages-${{ matrix.config.target }}-${{ matrix.group }}

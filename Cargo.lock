@@ -2628,7 +2628,7 @@ checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 [[package]]
 name = "leechcore-sys"
 version = "0.2.0"
-source = "git+https://github.com/forensicxlab/memflow-pcileech?rev=1756dfd24574190ac13d0c70ac2e2ee1d16c9496#1756dfd24574190ac13d0c70ac2e2ee1d16c9496"
+source = "git+https://github.com/forensicxlab/memflow-pcileech?rev=f17a835f7a8595fa44393092666b4263f94b0a56#f17a835f7a8595fa44393092666b4263f94b0a56"
 dependencies = [
  "cc",
  "ctor",
@@ -2879,7 +2879,7 @@ dependencies = [
 [[package]]
 name = "memflow-pcileech"
 version = "0.2.0"
-source = "git+https://github.com/forensicxlab/memflow-pcileech?rev=1756dfd24574190ac13d0c70ac2e2ee1d16c9496#1756dfd24574190ac13d0c70ac2e2ee1d16c9496"
+source = "git+https://github.com/forensicxlab/memflow-pcileech?rev=f17a835f7a8595fa44393092666b4263f94b0a56#f17a835f7a8595fa44393092666b4263f94b0a56"
 dependencies = [
  "leechcore-sys",
  "log",

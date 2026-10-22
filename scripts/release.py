@@ -384,7 +384,7 @@ def assemble(directory):
     directory = Path(directory)
     data = metadata()
     expected = {
-        (item["module"], config["target"])
+        (item["module"], config["target"]): item
         for item in packages(data) for config in targets()
     }
     source = {"commit": git_commit(), "cargo_lock_sha256": digest(ROOT / "Cargo.lock")}
@@ -398,13 +398,21 @@ def assemble(directory):
             identity = (record["module"], record["target"])
             if identity not in expected or identity in seen:
                 raise RuntimeError("Unexpected or duplicate package: " + str(identity))
+            item = expected[identity]
+            for field in ("module", "version", "binary", "path", "group"):
+                if record[field] != item[field]:
+                    raise RuntimeError("Package metadata does not match the source: " + field)
+            if record["module_commit"] != git_commit(ROOT / item["path"]):
+                raise RuntimeError("Package module commit does not match the source")
+            if Path(record["archive"]).name != record["archive"]:
+                raise RuntimeError("Invalid archive filename")
             seen.add(identity)
             archive = directory / record["archive"]
             if digest(archive) != record["sha256"] or archive.stat().st_size != record["size"]:
                 raise RuntimeError("Archive checksum/size mismatch: " + str(archive))
             records.append(record)
-    if seen != expected:
-        raise RuntimeError("Missing release packages: " + str(sorted(expected - seen)))
+    if seen != set(expected):
+        raise RuntimeError("Missing release packages: " + str(sorted(set(expected) - seen)))
     records.sort(key=lambda item: (item["module"], item["target"]))
     write_json(directory / "manifest.json", {
         "schema": 1, "source": source, "targets": targets(), "packages": records,
@@ -475,6 +483,16 @@ def publish(directory, channel, tag=None):
         if not existing["isDraft"] or existing["targetCommitish"] != commit:
             raise RuntimeError("Refusing to overwrite an existing release: " + tag)
     else:
+        repository = os.environ.get("GITHUB_REPOSITORY") or run(
+            ["gh", "repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"],
+            capture=True,
+        )
+        reference = subprocess.run(
+            ["gh", "api", "repos/" + repository + "/commits/" + tag, "--jq", ".sha"],
+            cwd=ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+        )
+        if reference.returncode == 0 and reference.stdout.strip() != commit:
+            raise RuntimeError("Release tag points at a different source commit")
         args = ["gh", "release", "create", tag, "--target", commit, "--draft",
                 "--title", ("Exhume Toolkit " if channel == "stable" else "Latest main build ") + tag,
                 "--notes-file", directory / "release-notes.md"]
@@ -487,6 +505,13 @@ def publish(directory, channel, tag=None):
     # Bound command length on Windows and keep uploads resumable while still private.
     for offset in range(0, len(assets), 10):
         run(["gh", "release", "upload", tag, "--clobber", *assets[offset:offset + 10]])
+    uploaded = json.loads(run(
+        ["gh", "release", "view", tag, "--json", "assets"], capture=True
+    ))
+    actual = {item["name"]: item["size"] for item in uploaded["assets"]}
+    expected = {path.name: path.stat().st_size for path in assets}
+    if actual != expected:
+        raise RuntimeError("Draft release assets are incomplete; keeping the release private")
     run(["gh", "release", "edit", tag, "--draft=false",
          "--latest=" + ("true" if channel == "stable" else "false")])
     print("Published:", tag)
