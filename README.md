@@ -5,6 +5,23 @@ sources to indexing, searching, and analysing their contents.
 
 The Exhume Toolkit documentation is maintained at [forensicxlab.com](https://www.forensicxlab.com/docs/exhume).
 
+## Rust support
+
+All Exhume crates require Rust 1.92 or newer. Each member declares this minimum
+in its own `Cargo.toml` so it also applies when the repository is used standalone.
+The umbrella workspace uses Cargo resolver 3 to prefer dependencies compatible
+with the declared Rust version.
+
+To validate the minimum supported Rust version from the workspace root:
+
+```sh
+rustup toolchain install 1.92.0 --profile minimal
+cargo +1.92.0 check --workspace --all-targets --locked
+cargo +1.92.0 test --workspace --locked
+```
+
+The umbrella CI runs these checks on Linux with both Rust 1.92.0 and stable.
+
 ## Modules
 
 | Module | Description |

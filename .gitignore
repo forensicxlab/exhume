@@ -68,3 +68,4 @@ venv/
 # Cargo audit / outdated caches
 .cargo-cache/
 .cargo-audit.toml
+.claude

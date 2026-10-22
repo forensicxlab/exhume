@@ -14,7 +14,7 @@ members = [
   "members/exhume_grep",
   "members/exhume_memory",
 ]
-resolver = "2"
+resolver = "3"
 
 [patch.crates-io]
 exhume_artefacts  = { path = "members/exhume_artefacts" }
