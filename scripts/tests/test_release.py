@@ -1,7 +1,7 @@
 import importlib.util
 import io
 import json
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import struct
 import subprocess
 import tarfile
@@ -14,6 +14,22 @@ import zipfile
 spec = importlib.util.spec_from_file_location("release", Path(__file__).parents[1] / "release.py")
 release = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(release)
+
+class InventoryTests(unittest.TestCase):
+    def test_windows_inventory_uses_portable_source_paths(self):
+        data = {
+            "workspace_members": ["agent"],
+            "packages": [{
+                "id": "agent", "name": "exhume_agent", "version": "0.2.0",
+                "manifest_path": r"C:\workspace\members\exhume_agent\Cargo.toml",
+                "targets": [{"name": "exhume-agent", "kind": ["bin"]}],
+            }],
+        }
+        with patch.object(release, "ROOT", PureWindowsPath(r"C:\workspace")), \
+                patch.object(release, "Path", PureWindowsPath):
+            result = release.packages(data)
+        self.assertEqual(result[0]["path"], "members/exhume_agent")
+        self.assertEqual(result[0]["binary"], "exhume-agent")
 
 
 class ArchiveTests(unittest.TestCase):

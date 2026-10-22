@@ -76,7 +76,7 @@ def packages(data, group=None):
                     "module": package["name"],
                     "version": package["version"],
                     "binary": binary["name"],
-                    "path": str(Path(package["manifest_path"]).parent.relative_to(ROOT)),
+                    "path": Path(package["manifest_path"]).parent.relative_to(ROOT).as_posix(),
                     "group": current_group,
                 })
     return sorted(result, key=lambda item: (item["module"], item["binary"]))
