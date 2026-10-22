@@ -1,0 +1,163 @@
+name: Verify toolkit snapshot
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: Exact candidate commit to verify
+        type: string
+        default: ""
+permissions:
+  contents: read
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: "0"
+  CARGO_PROFILE_DEV_DEBUG: "0"
+  CARGO_PROFILE_TEST_DEBUG: "0"
+  PYTHONDONTWRITEBYTECODE: "1"
+jobs:
+  tooling:
+    name: Release tooling
+    runs-on: ubuntu-22.04
+    outputs:
+      targets: ${{ steps.matrix.outputs.targets }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.13"
+      - name: Test packaging and publication safeguards
+        run: python -m unittest discover -s scripts/tests -v
+      - name: Lint GitHub workflows
+        env:
+          ACTIONLINT_VERSION: "1.7.12"
+        run: |
+          archive=$(printf 'actionlint_%s_linux_amd64.tar.gz' "$ACTIONLINT_VERSION")
+          checksums=$(printf 'actionlint_%s_checksums.txt' "$ACTIONLINT_VERSION")
+          base="https://github.com/rhysd/actionlint/releases/download/v$ACTIONLINT_VERSION"
+          curl --fail --silent --show-error --location --retry 3 "$base/$archive" -o "$RUNNER_TEMP/$archive"
+          curl --fail --silent --show-error --location --retry 3 "$base/$checksums" -o "$RUNNER_TEMP/actionlint-checksums.txt"
+          (cd "$RUNNER_TEMP" && sha256sum --check --ignore-missing actionlint-checksums.txt)
+          tar -xzf "$RUNNER_TEMP/$archive" -C "$RUNNER_TEMP" actionlint
+          "$RUNNER_TEMP/actionlint" -color
+      - id: matrix
+        name: Read the supported target matrix
+        run: echo "targets=$(python scripts/release.py matrix)" >> "$GITHUB_OUTPUT"
+  test:
+    name: Rust ${{ matrix.toolchain }}
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: ["1.92.0", stable]
+    env:
+      RUSTUP_TOOLCHAIN: ${{ matrix.toolchain }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          submodules: recursive
+          persist-credentials: false
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential clang cmake libclang-dev libssl-dev libusb-1.0-0-dev nasm pkg-config
+      - name: Install Rust
+        run: rustup toolchain install "$RUSTUP_TOOLCHAIN" --profile minimal
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+          key: cargo-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('Cargo.lock') }}
+      - name: Verify pinned sources and dependency graph
+        run: python3 scripts/release.py check-sources
+      - name: Check all targets
+        run: cargo check --workspace --all-targets --locked
+      - name: Run tests and doctests
+        run: cargo test --workspace --locked
+  binaries:
+    name: ${{ matrix.config.target }} / ${{ matrix.group }}
+    needs: tooling
+    runs-on: ${{ matrix.config.runner }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        config: ${{ fromJSON(needs.tooling.outputs.targets).include }}
+        group: [core, memory]
+    defaults:
+      run:
+        shell: bash
+    env:
+      RUSTUP_TOOLCHAIN: "1.92.0"
+      CARGO_BUILD_JOBS: "2"
+      CARGO_PROFILE_RELEASE_DEBUG: "0"
+      CARGO_PROFILE_RELEASE_STRIP: symbols
+      CARGO_PROFILE_RELEASE_LTO: thin
+      RUSTFLAGS: ${{ matrix.config.platform == 'windows' && '-C target-feature=+crt-static' || '' }}
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          submodules: recursive
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.13"
+      - name: Configure the native MSVC toolchain
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1
+        with:
+          arch: ${{ matrix.config.arch }}
+      - name: Install Linux build and packaging dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential clang cmake libclang-dev libssl-dev libusb-1.0-0-dev nasm pkg-config patchelf
+      - name: Install macOS build dependencies
+        if: runner.os == 'macOS'
+        run: brew install cmake nasm pkg-config libusb
+      - name: Install Windows assembly tools
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          if (-not (Get-Command nasm -ErrorAction SilentlyContinue)) {
+            choco install nasm --yes --no-progress
+            if ($LASTEXITCODE -ne 0) { throw "NASM installation failed" }
+            "$env:ProgramFiles\NASM" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          }
+      - name: Install the release compiler
+        env:
+          RELEASE_TARGET: ${{ matrix.config.target }}
+        run: |
+          rustup toolchain install "$RUSTUP_TOOLCHAIN" --profile minimal
+          rustup target add "$RELEASE_TARGET"
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+          key: cargo-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('Cargo.lock') }}
+      - name: Compile release executables
+        env:
+          RELEASE_TARGET: ${{ matrix.config.target }}
+          RELEASE_GROUP: ${{ matrix.group }}
+        run: python scripts/release.py build --target "$RELEASE_TARGET" --group "$RELEASE_GROUP"
+      - name: Package, audit dependencies, and smoke-test extracted executables
+        env:
+          RELEASE_TARGET: ${{ matrix.config.target }}
+          RELEASE_GROUP: ${{ matrix.group }}
+        run: python scripts/release.py package --target "$RELEASE_TARGET" --group "$RELEASE_GROUP"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: packages-${{ matrix.config.target }}-${{ matrix.group }}
+          path: dist/*
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 7

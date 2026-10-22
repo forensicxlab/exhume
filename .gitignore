@@ -17,7 +17,7 @@ target/
 
 # Cargo package backups
 **/*.rs.bk
-Cargo.lock         # keep this ignored in a workspace (see note below)
+# The umbrella Cargo.lock is committed for reproducible executable builds.
 
 # Generated docs
 **/doc/
@@ -69,3 +69,5 @@ venv/
 .cargo-cache/
 .cargo-audit.toml
 .claude
+dist/
+__pycache__/

@@ -1,0 +1,88 @@
+name: Update toolkit modules
+on:
+  schedule:
+    - cron: "23 4 * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: update-toolkit-modules
+  cancel-in-progress: false
+jobs:
+  prepare:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    outputs:
+      changed: ${{ steps.update.outputs.changed }}
+      commit: ${{ steps.update.outputs.commit }}
+    env:
+      RUSTUP_TOOLCHAIN: "1.92.0"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: main
+          submodules: recursive
+          fetch-depth: 0
+      - name: Install Rust
+        run: rustup toolchain install "$RUSTUP_TOOLCHAIN" --profile minimal
+      - name: Prepare a pinned candidate snapshot
+        id: update
+        run: |
+          python3 scripts/release.py sync-modules
+          git add Cargo.lock members
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Update pinned Exhume modules"
+          branch="automation/module-updates"
+          previous=$(git ls-remote origin "refs/heads/$branch" | cut -f1)
+          git push "--force-with-lease=refs/heads/$branch:$previous" origin "HEAD:refs/heads/$branch"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  verify:
+    needs: prepare
+    if: needs.prepare.outputs.changed == 'true'
+    uses: ./.github/workflows/verify.yml
+    with:
+      ref: ${{ needs.prepare.outputs.commit }}
+  propose:
+    needs: [prepare, verify]
+    if: always() && needs.prepare.outputs.changed == 'true'
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      pull-requests: write
+      statuses: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      SNAPSHOT_COMMIT: ${{ needs.prepare.outputs.commit }}
+      VERIFY_RESULT: ${{ needs.verify.result }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - name: Record the result on the exact candidate commit
+        run: |
+          state=failure
+          if [ "$VERIFY_RESULT" = success ]; then state=success; fi
+          gh api --method POST "repos/$GH_REPO/statuses/$SNAPSHOT_COMMIT" \
+            -f "state=$state" -f context="Toolkit snapshot" \
+            -f "target_url=$RUN_URL" -f description="Rust tests and all six native release builds"
+          if [ "$VERIFY_RESULT" != success ]; then
+            echo "Candidate failed verification; no new pull request will be opened."
+            exit 1
+          fi
+      - name: Propose the tested module revisions
+        run: |
+          body="$RUNNER_TEMP/module-updates.md"
+          printf 'Update the pinned module commits and workspace lockfile.\n\nVerified commit: %s\n\nAll Rust checks, tests, six native targets, and extracted-package smoke tests passed: %s\n' "$SNAPSHOT_COMMIT" "$RUN_URL" > "$body"
+          number=$(gh pr list --base main --head automation/module-updates --json number --jq '.[0].number // empty')
+          if [ -n "$number" ]; then
+            gh pr edit "$number" --body-file "$body"
+          else
+            gh pr create --base main --head automation/module-updates \
+              --title "Update pinned Exhume modules" --body-file "$body"
+          fi
