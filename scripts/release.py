@@ -26,7 +26,7 @@ GROUPS = ("core", "memory")
 
 def run(args, cwd=ROOT, capture=False, **kwargs):
     result = subprocess.run(
-        [str(arg) for arg in args], cwd=cwd, check=True, text=True,
+        [str(arg) for arg in args], cwd=cwd, check=True, text=True, encoding="utf-8",
         stdout=subprocess.PIPE if capture else None, **kwargs,
     )
     return result.stdout.strip() if capture else ""
@@ -266,7 +266,7 @@ def safe_extract(archive, destination):
     """Extract only regular files/directories within the archive's own root."""
     def safe(name):
         path = PurePosixPath(name)
-        if path.is_absolute() or ".." in path.parts or "\\" in name:
+        if path.is_absolute() or ".." in path.parts or "\\" in name or re.match(r"^[A-Za-z]:", name):
             raise RuntimeError("Unsafe archive path: " + name)
     if archive.name.endswith(".zip"):
         with zipfile.ZipFile(archive) as stream:

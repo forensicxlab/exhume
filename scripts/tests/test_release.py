@@ -20,7 +20,7 @@ class ArchiveTests(unittest.TestCase):
     def test_rejects_path_traversal_and_absolute_paths(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            for name in ("../escaped", "/absolute", "root/../../escaped", r"root\..\escaped"):
+            for name in ("../escaped", "/absolute", "root/../../escaped", r"root\..\escaped", "C:/escaped"):
                 with self.subTest(name=name):
                     archive = root / "unsafe.tar.gz"
                     with tarfile.open(archive, "w:gz") as stream:
@@ -153,6 +153,15 @@ class ReleaseTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "duplicate package"):
             release.assemble(self.dist)
 
+    def test_assembly_rejects_a_version_from_a_different_snapshot(self):
+        self.write_manifest()
+        path = self.dist / "manifest-test-core.json"
+        manifest = json.loads(path.read_text())
+        manifest["packages"][0]["version"] = "9.9.9"
+        release.write_json(path, manifest)
+        with self.assertRaisesRegex(RuntimeError, "metadata does not match"):
+            release.assemble(self.dist)
+
     def test_complete_snapshot_has_checksums_and_source_manifest(self):
         self.write_manifest()
         release.assemble(self.dist)
@@ -186,6 +195,68 @@ class ReleaseTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "toolkit-"):
                 release.publish(self.dist, "stable", "main")
             github.assert_not_called()
+
+    def test_upload_failure_keeps_the_release_private(self):
+        self.write_manifest()
+        missing = subprocess.CompletedProcess([], 1, "")
+        def github(args, **kwargs):
+            if args[:3] == ["gh", "release", "upload"]:
+                raise subprocess.CalledProcessError(1, args)
+            return ""
+        with patch.dict(release.os.environ, {"GITHUB_REPOSITORY": "owner/repo"}), \
+                patch.object(release.subprocess, "run", return_value=missing), \
+                patch.object(release, "run", side_effect=github) as external:
+            with self.assertRaises(subprocess.CalledProcessError):
+                release.publish(self.dist, "stable", "toolkit-test")
+            self.assertFalse(any(call.args[0][:3] == ["gh", "release", "edit"]
+                                 for call in external.call_args_list))
+
+    def test_missing_uploaded_asset_keeps_the_release_private(self):
+        self.write_manifest()
+        missing = subprocess.CompletedProcess([], 1, "")
+        def github(args, **kwargs):
+            return json.dumps({"assets": []}) if args[:3] == ["gh", "release", "view"] else ""
+        with patch.dict(release.os.environ, {"GITHUB_REPOSITORY": "owner/repo"}), \
+                patch.object(release.subprocess, "run", return_value=missing), \
+                patch.object(release, "run", side_effect=github) as external:
+            with self.assertRaisesRegex(RuntimeError, "keeping the release private"):
+                release.publish(self.dist, "stable", "toolkit-test")
+            self.assertFalse(any(call.args[0][:3] == ["gh", "release", "edit"]
+                                 for call in external.call_args_list))
+
+    def test_existing_tag_must_point_at_the_compiled_commit(self):
+        self.write_manifest()
+        responses = [
+            subprocess.CompletedProcess([], 1, ""),
+            subprocess.CompletedProcess([], 0, "b" * 40),
+        ]
+        with patch.dict(release.os.environ, {"GITHUB_REPOSITORY": "owner/repo"}), \
+                patch.object(release.subprocess, "run", side_effect=responses), \
+                patch.object(release, "run") as external:
+            with self.assertRaisesRegex(RuntimeError, "different source commit"):
+                release.publish(self.dist, "stable", "toolkit-test")
+            external.assert_not_called()
+
+    def test_publish_promotes_only_a_complete_uploaded_snapshot(self):
+        self.write_manifest()
+        missing = subprocess.CompletedProcess([], 1, "")
+        def github(args, **kwargs):
+            if args[:3] == ["gh", "release", "view"]:
+                files = [self.dist / "exhume_agent-test.tar.gz",
+                         self.dist / "manifest.json", self.dist / "SHA256SUMS"]
+                return json.dumps({"assets": [
+                    {"name": path.name, "size": path.stat().st_size} for path in files
+                ]})
+            return ""
+        with patch.dict(release.os.environ, {"GITHUB_REPOSITORY": "owner/repo"}), \
+                patch.object(release.subprocess, "run", return_value=missing), \
+                patch.object(release, "run", side_effect=github) as external:
+            release.publish(self.dist, "stable", "toolkit-test")
+            calls = [call.args[0] for call in external.call_args_list]
+            self.assertIn("--draft", calls[0])
+            self.assertEqual(calls[-1], [
+                "gh", "release", "edit", "toolkit-test", "--draft=false", "--latest=true"
+            ])
 
 
 if __name__ == "__main__":

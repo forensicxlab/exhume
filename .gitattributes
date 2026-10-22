@@ -1,0 +1,2 @@
+# Hash the same source and lockfile bytes on every native runner.
+* text=auto eol=lf

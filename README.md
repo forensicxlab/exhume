@@ -94,10 +94,14 @@ verification/build/package suite before opening or updating one pull request.
 Merge that pull request to refresh the main downloads. Incompatible snapshots
 fail verification and do not produce a new release.
 
-The repository must allow GitHub Actions to create pull requests. The updater
-records its verification result on the exact candidate commit, so its tests do
-not depend on a second workflow being triggered by GITHUB_TOKEN-created pull
-requests. No publishing credentials or crates.io token are required.
+The updater needs the repository setting "Allow GitHub Actions to create and
+approve pull requests" under Settings > Actions > General > Workflow permissions.
+GitHub couples creation and review-approval permission in this setting. The
+updater uses PR creation and commit statuses. Keep default workflow token
+permissions read-only; individual jobs request the permissions they need.
+The updater records its verification result on the exact candidate commit, so
+its tests do not depend on a second workflow being triggered by GITHUB_TOKEN-created
+pull requests. No publishing credentials or crates.io token are required.
 
 The target matrix lives in .github/release-targets.json. Packaging and release
 validation are shared by scripts/release.py. To test the release tooling locally:
