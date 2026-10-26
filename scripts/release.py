@@ -307,6 +307,14 @@ def smoke_archive(archive, record, config):
                 cwd=destination, capture=True, timeout=60, stdin=subprocess.DEVNULL)
             if exported.read_bytes() != source.read_bytes():
                 raise RuntimeError("Packaged exhume_body RAW round-trip failed")
+        encrypted_tests = {
+            "exhume_body": "EncryptedBodyTests",
+            "exhume_partitions": "EncryptedPartitionTests",
+        }
+        if record["module"] in encrypted_tests:
+            run([sys.executable, ROOT / "scripts/tests/test_encrypted_cli.py",
+                 encrypted_tests[record["module"]], "-v"],
+                env={**os.environ, "EXHUME_TEST_BIN_DIR": str(stage)})
         print("Smoke passed:", archive.name)
 
 
