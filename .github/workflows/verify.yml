@@ -79,6 +79,10 @@ jobs:
         run: cargo check --workspace --all-targets --locked
       - name: Run tests and doctests
         run: cargo test --workspace --locked
+      - name: Build and exercise every CLI, including encrypted EWF images
+        run: |
+          cargo build --workspace --bins --locked
+          EXHUME_TEST_BIN_DIR=target/debug python3 -m unittest discover -s scripts/tests -v
   binaries:
     name: ${{ matrix.config.target }} / ${{ matrix.group }}
     needs: tooling
