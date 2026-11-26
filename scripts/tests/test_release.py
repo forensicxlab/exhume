@@ -32,6 +32,43 @@ class InventoryTests(unittest.TestCase):
         self.assertEqual(result[0]["binary"], "exhume-agent")
 
 
+class BuildTests(unittest.TestCase):
+    def test_core_release_builds_enable_encrypted_recovery(self):
+        recovery = ("exhume_artefacts", "exhume_indexer", "exhume_agent")
+        items = [{"module": name} for name in (*recovery, "exhume_body")]
+        for target, feature in (
+            ("aarch64-apple-darwin", "sqlcipher"),
+            ("x86_64-unknown-linux-gnu", "sqlcipher"),
+            ("aarch64-pc-windows-msvc", "sqlcipher-vendored-openssl"),
+        ):
+            with self.subTest(target=target), patch.object(release, "metadata", return_value={}), \
+                    patch.object(release, "packages", return_value=items), patch.object(release, "run") as run:
+                release.build(target, "core")
+                args = run.call_args.args[0]
+                enabled = args[args.index("--features") + 1].split(",")
+                self.assertEqual(set(enabled), {f"{package}/{feature}" for package in recovery})
+                self.assertIn("--locked", args)
+                self.assertIn("--release", args)
+
+    def test_memory_build_does_not_request_disk_recovery_features(self):
+        with patch.object(release, "metadata", return_value={}), \
+                patch.object(release, "packages", return_value=[{"module": "exhume_memory"}]), \
+                patch.object(release, "run") as run:
+            release.build("aarch64-apple-darwin", "memory")
+            self.assertNotIn("--features", run.call_args.args[0])
+
+    def test_recovery_runtime_notes_describe_the_packaged_backend(self):
+        for module in ("exhume_artefacts", "exhume_indexer", "exhume_agent"):
+            for platform in ("linux", "macos", "windows"):
+                with self.subTest(module=module, platform=platform):
+                    notes = release.runtime_notes(
+                        {"module": module, "binary": module, "version": "0.6.0", "group": "core"},
+                        {"platform": platform, "target": "test-target"},
+                    )
+                    self.assertIn("SQLCipher database decryption is included", notes)
+                    self.assertEqual("statically bundled" in notes, platform == "windows")
+
+
 class ArchiveTests(unittest.TestCase):
     def test_rejects_path_traversal_and_absolute_paths(self):
         with tempfile.TemporaryDirectory() as directory:

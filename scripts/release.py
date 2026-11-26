@@ -250,6 +250,10 @@ def runtime_notes(item, config):
         ]
     else:
         notes += ["Built with the static MSVC runtime and tested on the matching native runner."]
+    if item["module"] in ("exhume_artefacts", "exhume_indexer", "exhume_agent"):
+        notes += ["SQLCipher database decryption is included in this executable."]
+        if config["platform"] == "windows":
+            notes += ["SQLCipher's OpenSSL crypto provider is statically bundled."]
     if item["group"] == "memory":
         notes += [
             "",
@@ -315,6 +319,14 @@ def smoke_archive(archive, record, config):
             run([sys.executable, ROOT / "scripts/tests/test_encrypted_cli.py",
                  encrypted_tests[record["module"]], "-v"],
                 env={**os.environ, "EXHUME_TEST_BIN_DIR": str(stage)})
+        recovery_tests = {
+            "exhume_artefacts": "ArtefactRecoveryTests",
+            "exhume_indexer": "IndexerRecoveryTests",
+        }
+        if record["module"] in recovery_tests:
+            run([sys.executable, ROOT / "scripts/tests/test_recovery_cli.py",
+                 recovery_tests[record["module"]], "-v"],
+                env={**os.environ, "EXHUME_TEST_BIN_DIR": str(stage)})
         print("Smoke passed:", archive.name)
 
 
@@ -324,6 +336,11 @@ def build(target, group):
     args = ["cargo", "build", "--release", "--locked", "--target", target, "--bins"]
     for package in selected:
         args += ["--package", package]
+    cipher = "sqlcipher-vendored-openssl" if target.endswith("windows-msvc") else "sqlcipher"
+    features = [f"{package}/{cipher}" for package in selected
+                if package in ("exhume_artefacts", "exhume_indexer", "exhume_agent")]
+    if features:
+        args += ["--features", ",".join(features)]
     run(args)
 
 
