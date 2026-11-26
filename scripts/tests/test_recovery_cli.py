@@ -1,5 +1,6 @@
 """Decrypt a synthetic Signal database through the exact distributed binaries."""
 import hashlib
+from contextlib import closing
 import json
 import os
 from pathlib import Path
@@ -60,7 +61,22 @@ class IndexerRecoveryTests(RecoveryCase):
         report = json.loads(result.stdout)
         self.assertEqual(len(report["recovery"]["jobs"]), 1)
         self.assertEqual(report["recovery"]["jobs"][0]["status"], "complete")
-        with sqlite3.connect(index) as connection:
+        with closing(sqlite3.connect(index)) as connection:
+            count = connection.execute("SELECT COUNT(*) FROM artifact_objects WHERE parser='desktop_signal' AND kind='mobile.communication.message'").fetchone()[0]
+        self.assertEqual(count, 17)
+
+        # A separate CLI process must reopen evidence paths without the first
+        # traversal's host-path cache, while retaining the existing inventory.
+        first = report["recovery"]["jobs"][0]
+        retried = self.cli("exhume_indexer", "--body", self.root / "source", "--database", index,
+                           "--partition-id", "1", "--retry-recovery", "--recovery-target", first["target_id"],
+                           "--json-report", "--no-progress", "--no-recovery-input")
+        second = json.loads(retried.stdout)["recovery"]["jobs"][0]
+        self.assertEqual(second["status"], "complete")
+        self.assertEqual(second["target_id"], first["target_id"])
+        self.assertEqual(second["inventory_run_id"], first["inventory_run_id"])
+        self.assertNotEqual(second["attempt_id"], first["attempt_id"])
+        with closing(sqlite3.connect(index)) as connection:
             count = connection.execute("SELECT COUNT(*) FROM artifact_objects WHERE parser='desktop_signal' AND kind='mobile.communication.message'").fetchone()[0]
         self.assertEqual(count, 17)
 
